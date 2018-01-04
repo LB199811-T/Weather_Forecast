@@ -1,5 +1,7 @@
 package com.lb199811_t.weather.weather_forecast.db;
 
+import org.litepal.crud.DataSupport;
+
 /**
  * Created by Administrator on 2018/1/4.
  */

@@ -6,9 +6,9 @@
 
     <list>
 
-        <mapping class="com.weather_forecast.android.db.Province" />
-        <mapping class="com.weather_forecast.android.db.City" />
-        <mapping class="com.weather_forecast.android.db.County" />
+        <mapping class="com.lb199811_t.weather.weather_forecast.android.db.Province" />
+        <mapping class="com.lb199811_t.weather.weather_forecast.android.db.City" />
+        <mapping class="com.lb199811_t.weather.weather_forecast.android.db.County" />
 
     </list>
 

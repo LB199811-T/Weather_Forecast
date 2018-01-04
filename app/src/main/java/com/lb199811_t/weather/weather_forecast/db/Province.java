@@ -1,11 +1,13 @@
 package com.lb199811_t.weather.weather_forecast.db;
 
 
+import org.litepal.crud.DataSupport;
+
 /**
  * Created by Administrator on 2018/1/4.
  */
 
-public class Province extends dataSupport {
+public class Province extends DataSupport {
     private  int id;
     private String provinceName;
     private  int provinceCode;
