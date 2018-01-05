@@ -17,6 +17,8 @@ import com.lb199811_t.weather.weather_forecast.db.City;
 import com.lb199811_t.weather.weather_forecast.db.County;
 import com.lb199811_t.weather.weather_forecast.db.Province;
 
+import org.litepal.crud.DataSupport;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,7 +44,7 @@ public class ChooseAreaFragment extends Fragment {
     private List<Province> provinceList;
 
     /**
-     *市列表
+     * 市列表
      */
     private List<City> cityList;
 
@@ -67,33 +69,87 @@ public class ChooseAreaFragment extends Fragment {
     private int currentLevel;
 
     @Override
-    public View onCreateView(LayoutInflater inflater,  ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.choos_area,container ,false);
-        titleText  = (TextView) view.findViewById(R.id.title_text);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.choos_area, container, false);
+        titleText = (TextView) view.findViewById(R.id.title_text);
         backButton = (Button) view.findViewById(R.id.back_button);
         listView = (ListView) view.findViewById(R.id.list_view);
-        adapter = new ArrayAdapter<>(getContext(),android.R.layout.simple_list_item_1,datalist);
+        adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, datalist);
         listView.setAdapter(adapter);
         return view;
     }
 
     @Override
-    public void onActivityCreated( Bundle savedInstanceState) {
+    public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
-            public void OnItemClick(AdapterView<?> parent,View view, int position,long id){
-                if(currentLevel == LEVEL_PROVINCE){
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long Id) {
+                if (currentLevel == LEVEL_PROVINCE) {
                     selectedProvince = provinceList.get(position);
                     queryCities();
-                }else if (currentLevel == LEVEL_CITY) {
+                } else if (currentLevel == LEVEL_CITY) {
                     selectCity = cityList.get(position);
                     queryCounties();
                 }
             }
+
         });
-        
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (currentLevel == LEVEL_COUNTY) {
+                    queryCities();
+                } else if (currentLevel == LEVEL_CITY) {
+                    queryProvince();
+                }
+            }
+        });
+        queryProvince();
+    }
+
+    /**
+     * 查询全国所有省市的省，优先从数据库查询，如果没有查询再去服务器上查询
+     */
+    private void queryProvince() {
+        titleText.setText("中国");
+        backButton.setVisibility(View.GONE);
+        provinceList = DataSupport.findAll(Province.class);
+        if (provinceList.size() > 0) {
+            datalist.clear();
+            for (Province province : provinceList) {
+                datalist.add(province.getProvinceName());
+            }
+            adapter.notifyDataSetChanged();
+            listView.setSelection(0);
+            currentLevel = LEVEL_PROVINCE;
+        } else {
+            String address = "http://guolin.tech/api/china";
+            queryFromServer(address, "province");
+        }
+    }
+
+    /**
+     * 查询选择省内所有的市，优先从数据库查询，如果没有查询到再去服务器上查询
+     */
+    private void queryCities() {
+        titleText.setText(selectedProvince.getProvinceName());
+        backButton.setVisibility(View.VISIBLE);
+        cityList = DataSupport.where("provinceid=?", String.valueOf(selectedProvince.getId())).find(City.class);
+        if (cityList.size() > 0) {
+            datalist.clear();
+            for (City city : cityList) {
+                datalist.add(city.getCityName());
+            }
+            adapter.notifyDataSetChanged();
+            listView.setSelection(0);
+            currentLevel = LEVEL_CITY;
+        } else {
+            int provinceCode = selectedProvince.getProvinceCode();
+            String address = "http://guolin.tech/api/china/" + provinceCode;
+            queryFromServer(address, "city");
+        }
     }
 
 }
