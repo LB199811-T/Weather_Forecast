@@ -40,7 +40,7 @@ public class Utility {
     /**
      * 解析和服务器返回的市级数据
      */
-    public static boolean handleCityResponse(String response,int province){
+    public static boolean handleCityResponse(String response,int provinceId){
         if(!TextUtils.isEmpty(response)){
             try {
                 JSONArray allCities = new JSONArray(response);
@@ -62,7 +62,7 @@ public class Utility {
     /**
      * 解析和服务器返回的县级数据
      */
-    public static boolean handleCountyResponse(String response) {
+    public static boolean handleCountyResponse(String response ,int cityId) {
         if (!TextUtils.isEmpty(response)) {
             try {
                 JSONArray allCounties = new JSONArray(response);
